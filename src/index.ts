@@ -1,5 +1,6 @@
 import * as htmlparser2 from "htmlparser2";
 import {type ChildNode, Document, Element, Text} from "domhandler";
+import { sendMessage } from "./webhook";
 
 class Apartment {
     wid: string;
@@ -78,12 +79,14 @@ async function getApartments(house: string): Promise<Apartment[] | null>{
     const page = htmlparser2.parseDocument(html);
     const table = findTable(page);
     if (table === null) {
-        console.error("Could not find table");
+        console.error("Could not find table for " + house);
+        await sendMessage("Could not find table for " + house)
         return null;
     }
     const tbody = findTableBody(table);
     if (tbody === null) {
-        console.error("Could not find tablebody");
+        console.error("Could not find tablebody for " + house);
+        await sendMessage("Could not find tablebody for " + house);
         return null;
     }
     const apartments: Apartment[] = [];
@@ -107,8 +110,8 @@ async function getApartments(house: string): Promise<Apartment[] | null>{
 }
 
 
-const houses = ["halldorhus", "laxnesshus", "organistens hus", "nadinehus"];
-// const houses = ["halldorhus"];
+// const houses = ["halldorhus", "laxnesshus", "organistens hus", "nadinehus"];
+const houses = ["halldorhus"];
 
 for (let house of houses) {
     const apartments = await getApartments(house);
